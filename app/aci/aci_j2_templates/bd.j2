@@ -1,0 +1,23 @@
+{
+    "fvBD": {
+        "attributes": {
+            "dn": "uni/tn-{{ tn_name }}/BD-{{ bd_name }}"
+            {% if arp -%}       ,"arpFlood": "{{ arp }}"           {%- endif %}
+            {% if garp -%}      ,"epMoveDetectMode": "{{ garp }}"  {%- endif %}
+            {% if mac -%}       ,"mac": "{{ mac }}"                {%- endif %}
+            {% if mdest -%}     ,"multiDstPktAct": "{{ mdest }}"   {%- endif %}
+            {% if ucr -%}       ,"unicastRoute": "{{ ucr }}"       {%- endif %}
+            {% if unk_uc -%}    ,"unkMacUcastAct": "{{ unk_uc }}"  {%- endif %}
+            {% if descr -%}     ,"descr": "{{ descr }}"            {%- endif %}
+        },
+        "children": [
+{% if vrf_name -%} {"fvRsCtx": {"attributes": {"tnFvCtxName": "{{ vrf_name }}"}}} {%- endif %}
+{% if l3out_payload -%}
+            ,{{ l3out_payload|tojson }}
+{%- endif %}
+{% if subnet_payload -%}
+            ,{{ subnet_payload|tojson }}
+{%- endif %}
+        ]
+    }
+}
