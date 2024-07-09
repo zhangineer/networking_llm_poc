@@ -1,0 +1,29 @@
+# Python files not to be committed: binaries, eggs, etc.
+.cache
+.coverage
+dist
+*.egg-info
+.eggs
+.mypy_cache
+*.pyc
+.pytest_cache
+/.python-version
+
+# Environment files
+.venv/
+.env
+
+# PyCharm files
+.idea
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Misc files
+.DS_Store
+
+# Logging files
+*.log
+
+# poetry
+poetry.lock
