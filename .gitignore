@@ -27,3 +27,4 @@ dist
 
 # poetry
 poetry.lock
+/.streamlit/secrets.toml
