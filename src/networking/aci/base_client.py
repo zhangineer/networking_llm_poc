@@ -14,10 +14,13 @@ class BaseACIClient:
     This class is for interacting with the Cisco ACI API
     """
 
-    def __init__(self):
-        self.apic = os.getenv('APIC')
-        self.apic_username = os.getenv('APIC_USERNAME')
-        self.apic_password = os.getenv('APIC_PASSWORD')
+    def __init__(self,
+                 apic_username=os.getenv('APIC_USERNAME'),
+                 apic=os.getenv('APIC'),
+                 apic_password=os.getenv('APIC_PASSWORD')):
+        self.apic = apic
+        self.apic_username = apic_username
+        self.apic_password = apic_password
         self.apic_port = os.getenv('APIC_PORT', 443)
         self.rest_session = None
 

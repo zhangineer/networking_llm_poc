@@ -1,0 +1,7 @@
+[theme]
+base="dark"
+primaryColor="lightblue"
+
+# for development purposes only
+[server]
+runOnSave = true
