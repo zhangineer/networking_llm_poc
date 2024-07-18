@@ -1,10 +1,10 @@
 import os
 
-from app.aci.acisession import Session
+from src.networking.aci.acisession import Session
 from dotenv import load_dotenv, find_dotenv
-from app.aci.moquery import MoQuery
-from app.aci.payload_builder import PayloadBuilder
-from utils.utils import register
+from src.networking.aci.moquery import MoQuery
+from src.networking.aci.payload_builder import PayloadBuilder
+from src.llm_api.utils.helper import register
 
 _ = load_dotenv((find_dotenv()))
 
@@ -15,8 +15,8 @@ class BaseACIClient:
     """
 
     def __init__(self,
+                 apic=os.getenv('APIC_IP'),
                  apic_username=os.getenv('APIC_USERNAME'),
-                 apic=os.getenv('APIC'),
                  apic_password=os.getenv('APIC_PASSWORD')):
         self.apic = apic
         self.apic_username = apic_username
@@ -28,6 +28,10 @@ class BaseACIClient:
         self.rest_session = Session(f"https://{self.apic}:{self.apic_port}", uid=f"{self.apic_username}",
                                     pwd=f"{self.apic_password}")
         self.rest_session.login()
+
+    def get_version(self):
+        query = MoQuery(self.rest_session, dn="mo/sys/showversion.json")
+        return query.imdata()
 
 
 class TenantOperation(BaseACIClient):
