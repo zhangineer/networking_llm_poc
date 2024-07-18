@@ -6,9 +6,9 @@ from tqdm import tqdm
 from dotenv import load_dotenv, find_dotenv
 import openai
 from langchain_openai import OpenAIEmbeddings
-from utils.utils import register
+from src.llm_api.utils.helper import register
 
-_ = load_dotenv((find_dotenv()))
+load_dotenv((find_dotenv()))
 
 openai.api_key = os.getenv('OPENAI_API_KEY')
 
