@@ -88,7 +88,7 @@ class Conversation:
         """
         Call the function returned by chatGPT. A list of functions is found in the FUNCTION_REGISTRY
         Args:
-            instance_name: instance of ACI client.
+            instance_name: instance of client.
                             This is instantiated by creating a Session object in the case with ACI
 
         Returns: Returns the result of the function call.
@@ -107,6 +107,7 @@ class Conversation:
             # dynamically call function - matching function call name to what's stored in the FUNCTION_REGISTRY
             function_call_result = FUNCTION_REGISTRY[function_name](instance_name, **kwargs)
         else:
+            logger.bind(log="chat").error(f"Function '{function_name}' not found in function registry {FUNCTION_REGISTRY}")
             raise KeyError(f"Function '{function_name}' not found in function registry {FUNCTION_REGISTRY}")
         logger.bind(log="chat").info(f"function call result {json.dumps(function_call_result, indent=4)}")
         self.add_function_call_to_messages(function_name=function_name, function_call_result=function_call_result)
