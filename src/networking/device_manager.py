@@ -33,12 +33,13 @@ def create_device_form():
     with st.form("device_info_form"):
         st.write("Enter Device Information")
         ip = st.text_input("IP Address")
+        hostname = st.text_input("Hostname")
         username = st.text_input("Username")
         password = encode_password(st.text_input("Password", type="password"))
-        os = st.selectbox("Operating System", ["IOS", "IOS-XE", "NX-OS", "APIC"])
+        os = st.selectbox("Operating System", ["IOS-XE", "NX-OS", "APIC"])
         submitted = st.form_submit_button("Add Device")
         if submitted:
-            return {"ip": ip, "username": username, "password": password, "os": os}
+            return {"ip": ip, hostname: "hostname", "username": username, "password": password, "os": os}
     return None
 
 
