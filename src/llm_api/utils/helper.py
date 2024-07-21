@@ -3,6 +3,7 @@
 General Utility Functions
 
 """
+from src.networking.nxos.nxos_client import get_or_create_nxos_device_session
 FUNCTION_REGISTRY = {}
 
 
@@ -13,6 +14,24 @@ def register(func):
     """
     FUNCTION_REGISTRY[func.__name__] = func
     return func
+
+
+@register
+def execute_show_cmd(device_name, cmd):
+    # Get or create the session
+    session = get_or_create_nxos_device_session(device_name)
+    # Execute the command
+    result = session.show_cmd(cmd)
+    return result
+
+
+@register
+def execute_config_cmd(device_name, cmd):
+    # Get or create the session
+    session = get_or_create_nxos_device_session(device_name)
+    # Execute the command
+    result = session.config_cmd(cmd)
+    return result
 
 
 def create_function_config(name: str, description: str, properties: dict = None, required: list = None) -> dict:

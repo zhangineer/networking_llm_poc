@@ -5,16 +5,37 @@ All open AI functions definitions are defined here
 """
 from src.llm_api.utils.helper import create_function_config
 
-show_cmd_function = create_function_config(
-    name="show_cmd",
+execute_config_cmd_function = create_function_config(
+    name="execute_config_cmd",
+    description="execute various nxos configuration commands, always start with `configure terminal",
+    properties={
+        "device_name": {
+            "type": "string",
+            "description": "The name of the device (e.g., R1, R2)"
+        },
+        "cmd": {
+            "type": "string",
+            "description": "configuration commands to be executed, multiple commands can be separated with ';' "
+        }
+    },
+    required=["device_name", "cmd"]
+)
+
+
+execute_show_cmd_function = create_function_config(
+    name="execute_show_cmd",
     description="execute various nxos show commands",
     properties={
+        "device_name": {
+            "type": "string",
+            "description": "The name of the device (e.g., R1, R2)"
+        },
         "cmd": {
             "type": "string",
             "description": "show command(s) to be executed, multiple commands can be separated with ';' "
         }
     },
-    required=["cmd"]
+    required=["device_name", "cmd"]
 )
 
 

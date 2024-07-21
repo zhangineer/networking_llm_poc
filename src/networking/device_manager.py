@@ -39,8 +39,17 @@ def create_device_form():
         os = st.selectbox("Operating System", ["IOS-XE", "NX-OS", "APIC"])
         submitted = st.form_submit_button("Add Device")
         if submitted:
-            return {"ip": ip, hostname: "hostname", "username": username, "password": password, "os": os}
+            return {"ip": ip, "hostname": hostname, "username": username, "password": password, "os": os}
     return None
+
+
+def get_device_login(hostname="", device_ip=""):
+    for device in st.session_state.devices:
+        if hostname.upper() in device.values() or device_ip in device.values():
+            return device['ip'], device['username'], decode_password(device['password'])
+    else:
+        print (f"host name {hostname} not found")
+        return st.session_state.messages.append(f"invalid hostname {hostname}")
 
 
 def upload_csv():

@@ -7,9 +7,6 @@ from src.llm_api.utils.functions import (get_bd_function,
                                          get_fabric_health_function,
                                          build_bd_function,
                                          get_configuration_guideline_function)
-from src.llm_api.utils.functions import (show_cmd_function)
-from src.networking.aci.base_client import BaseACIClient
-from src.networking.nxos.nxos_client import BaseClient
 from src.streamlit_app.utils.initialize import initialize_app
 import pandas as pd
 from src.networking.device_manager import create_device_form, save_devices, load_devices, upload_csv
@@ -17,6 +14,7 @@ from src.streamlit_app.utils.components import select_models, openai_model_expan
 from src.llm_api.openai_api import Conversation
 from loguru import logger
 from src.settings import get_settings
+from src.llm_api.utils.functions import (execute_show_cmd_function, execute_config_cmd_function)
 
 SETTINGS = get_settings()
 
@@ -90,12 +88,10 @@ with assistant_tab:
     if 'openai_api_key' in st.session_state:
         if "messages" not in st.session_state:
             st.session_state.messages = []
-        # if "user_message" not in st.session_state:
-        #     st.session_state.user_message = ""
 
         openai_api_key = st.session_state.openai_api_key
 
-        functions = [show_cmd_function]
+        functions = [execute_show_cmd_function, execute_config_cmd_function]
 
         if 'conversation' not in st.session_state:
             st.session_state.conversation = Conversation(
@@ -110,11 +106,9 @@ with assistant_tab:
         conversation = st.session_state.conversation
 
         for message in st.session_state.messages[1:]:
-            print("processing message....", message)
             if message.get('content') is not None:
                 with st.chat_message(message["role"]):
                     if message.get("content") and 'tool_call_id' not in message.keys():
-                        print ("will display this message", message)
                         st.markdown(message["content"])
                     if 'tool_call_id' in message.keys():
                         expander = st.expander("cli command result")
@@ -130,8 +124,8 @@ with assistant_tab:
                     # Send completion request along with user prompt
                     openai_response = conversation.send_completion_request()
                     while openai_response.get('tool_calls'):
-                        logger.bind(log="chat").info("Making function call.... ",
-                                                     openai_response['tool_calls'][0]['function'])
+                        function_name = openai_response['tool_calls'][0]['function']['name']
+                        logger.bind(log="chat").info(f"Making function call.... {function_name}")
                         # if "we want to access apic": #TODO-add-logic
                         #         apic = st.session_state.devices[0]['ip']
                         #         apic_username = st.session_state.devices[0]['username']
@@ -142,16 +136,22 @@ with assistant_tab:
                         #         conversation.send_completion_request()
                         #     response = conversation.messages[-1].get('content')
                         # elif "we want to access nxos": #TODO-add-logic
-                        nxos_device_ip = st.session_state.devices[1]['ip']
-                        nxos_username = st.session_state.devices[1]['username']
-                        nxos_password = st.session_state.devices[1]['password']
-                        nxos_client = BaseClient(device_ip=nxos_device_ip, username=nxos_username,
-                                                 password=nxos_password)
+                        # nxos_device_ip = st.session_state.devices[1]['ip']
+                        # nxos_username = st.session_state.devices[1]['username']
+                        # nxos_password = st.session_state.devices[1]['password']
+                        # nxos_client = BaseClient(device_ip=nxos_device_ip, username=nxos_username,
+                        #                          password=nxos_password)
                         if 'connection_error' in st.session_state and st.session_state.connection_error:
                             st.error(f"Connection Error: {st.session_state.connection_error}")
-
-                        function_result = conversation.call_function(nxos_client)
+                        # if calling device login, then we get this: get_device_login\" with arguments \"{'hostname': 'r1'}
+                        conversation.call_function()
                         openai_response = conversation.send_completion_request()
+                        # elif function_name == "get_device_login":
+                        #     login_fc_result = conversation.call_function()
+                        #     print ("current last message received.....", st.session_state.messages[-1])
+                        #     print ("after sending the login fc call result...", conversation.send_completion_request()) # trigger openAI to use the username/password to call baseclient
+                        #     inst = conversation.call_function(nxos_client)
+                        # openai_response = conversation.send_completion_request()
                 st.rerun()
 
         except Exception as e:

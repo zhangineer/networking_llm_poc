@@ -1,13 +1,13 @@
 from openai import OpenAI
+import openai
 from typing import List
 import json
-from src.networking.aci.rag import get_configuration_guideline
 from src.llm_api.utils.helper import FUNCTION_REGISTRY
 import tiktoken
 from loguru import logger
 import streamlit as st
 
-encoding_model_messages = "gpt-3.5-turbo"
+encoding_model_messages = "gpt-4o-mini"
 encoding_model_strings = "cl100k_base"
 function_call_limit = 50
 
@@ -61,20 +61,23 @@ class Conversation:
     def send_completion_request(self):
         logger.bind(log="chat").info(
             f"Sending completion request to chatGPT with the following:\n "
-            f"Message: {json.dumps(st.session_state.messages, indent=4)}\n"
+            f"Message: {st.session_state.messages}\n"
             f"Model: {self.model}\n"
             f"Tools: {self.functions}\n"
             f"ToolChoice: {self.tool_choice}\n"
         )
-        res = self.client.chat.completions.create(
-            model=self.model,
-            messages=st.session_state.messages,
-            tools=self.functions,
-            tool_choice=self.tool_choice,
-            temperature=self.temperature,
-            top_p=0,
-            max_tokens=self.max_tokens
-        )
+        try:
+            res = self.client.chat.completions.create(
+                model=self.model,
+                messages=st.session_state.messages,
+                tools=self.functions,
+                tool_choice=self.tool_choice,
+                temperature=self.temperature,
+                top_p=0,
+                max_tokens=self.max_tokens
+            )
+        except openai.BadRequestError as e:
+            st.error(e)
         self.usage = res.usage.model_dump()
         self.response = res.choices[0].message.model_dump()  # Returns dictionary
         if not self.response.get('function_call'):
@@ -84,7 +87,7 @@ class Conversation:
         st.session_state.messages.append(self.response)
         return self.response
 
-    def call_function(self, instance_name):
+    def call_function(self):
         """
         Call the function returned by chatGPT. A list of functions is found in the FUNCTION_REGISTRY
         Args:
@@ -98,18 +101,19 @@ class Conversation:
 
         Otherwise, we raise KeyError
         """
+        print ("Function call result", self.response['tool_calls'])
         function_name = self.response["tool_calls"][0]["function"]["name"]
         kwargs = json.loads(self.response["tool_calls"][0]["function"]["arguments"])
         logger.bind(log="chat").info(f"Calling function: \"{function_name}\" with arguments \"{kwargs}\"")
-        if function_name == 'get_configuration_guideline':
-            function_call_result = get_configuration_guideline(query=kwargs["query"])
-        elif function_name in FUNCTION_REGISTRY:
+        # if function_name == 'get_configuration_guideline':
+        #     function_call_result = get_configuration_guideline(query=kwargs["query"])
+        if function_name in FUNCTION_REGISTRY:
             # dynamically call function - matching function call name to what's stored in the FUNCTION_REGISTRY
-            function_call_result = FUNCTION_REGISTRY[function_name](instance_name, **kwargs)
+            function_call_result = FUNCTION_REGISTRY[function_name](**kwargs)
         else:
             logger.bind(log="chat").error(f"Function '{function_name}' not found in function registry {FUNCTION_REGISTRY}")
             raise KeyError(f"Function '{function_name}' not found in function registry {FUNCTION_REGISTRY}")
-        logger.bind(log="chat").info(f"function call result {json.dumps(function_call_result, indent=4)}")
+        logger.bind(log="chat").info(f"function call result {function_call_result}")
         self.add_function_call_to_messages(function_name=function_name, function_call_result=function_call_result)
         return function_call_result
 
