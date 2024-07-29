@@ -129,8 +129,11 @@ else:
                     model=SETTINGS.openai_model,
                     functions=functions
                 )
-                with st.spinner("resetting demo topology, please standby..."):
-                    reset_demo_topology()
+                if st.session_state.devices:
+                    with st.spinner("resetting demo topology, please standby..."):
+                        reset_demo_topology()
+                else:
+                    st.write("no devices found, please add device first")
             conversation = st.session_state.conversation
 
             for message in st.session_state.messages[1:]:
