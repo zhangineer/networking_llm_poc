@@ -7,7 +7,7 @@ import tiktoken
 from loguru import logger
 import streamlit as st
 
-encoding_model_messages = "gpt-4o-mini"
+encoding_model_messages = "gpt-4o"
 encoding_model_strings = "cl100k_base"
 function_call_limit = 50
 
@@ -25,9 +25,9 @@ class Conversation:
                  timeout: int,
                  temperature: float,
                  system_prompt: str,
-                 model: str = "gpt-4-0613",
+                 model: str = "gpt-4o", # update so models are loaded dynamically
                  tool_choice: str = "auto",
-                 max_tokens=256,
+                 max_tokens=4096,
                  functions: List = None):
         self.client = OpenAI(api_key=api_key, timeout=timeout, max_retries=max_retries)
         self.system_prompt = system_prompt
@@ -48,10 +48,11 @@ class Conversation:
     def add_user_message(message):
         return st.session_state.messages.append({"role": "user", "content": message})
 
-    def add_function_call_to_messages(self, function_name, function_call_result):
+    @staticmethod
+    def add_function_call_to_messages(function_name, function_call_result, tool_call_id):
         return st.session_state.messages.append(
             {
-                "tool_call_id": self.response["tool_calls"][0]["id"],
+                "tool_call_id": tool_call_id,
                 "role": "tool",
                 "name": function_name,
                 "content": function_call_result,
@@ -76,16 +77,20 @@ class Conversation:
                 top_p=0,
                 max_tokens=self.max_tokens
             )
-        except openai.BadRequestError as e:
+            # if not res:
+            #     logger.bind(log="chat").error(f"chatGPT did not return any response")
+            #     st.error("chatGPT did not return any response")
+            self.usage = res.usage.model_dump()
+            self.response = res.choices[0].message.model_dump()  # Returns dictionary
+            if not self.response.get('function_call'):
+                self.response.pop('function_call')
+            logger.bind(log="chat").info(f"chatGPT responded: {self.response}")
+            # each time we get a response back, we need to add the message to the context
+            st.session_state.messages.append(self.response)
+            return self.response
+        except Exception as e:
+            print ("HIT AN ESCEPTION !!! BAD REQUEST", e)
             st.error(e)
-        self.usage = res.usage.model_dump()
-        self.response = res.choices[0].message.model_dump()  # Returns dictionary
-        if not self.response.get('function_call'):
-            self.response.pop('function_call')
-        logger.bind(log="chat").info(f"chatGPT responded: {json.dumps(self.response, indent=4)}")
-        # each time we get a response back, we need to add the message to the context
-        st.session_state.messages.append(self.response)
-        return self.response
 
     def call_function(self):
         """
@@ -101,21 +106,28 @@ class Conversation:
 
         Otherwise, we raise KeyError
         """
-        print ("Function call result", self.response['tool_calls'])
-        function_name = self.response["tool_calls"][0]["function"]["name"]
-        kwargs = json.loads(self.response["tool_calls"][0]["function"]["arguments"])
-        logger.bind(log="chat").info(f"Calling function: \"{function_name}\" with arguments \"{kwargs}\"")
-        # if function_name == 'get_configuration_guideline':
-        #     function_call_result = get_configuration_guideline(query=kwargs["query"])
-        if function_name in FUNCTION_REGISTRY:
-            # dynamically call function - matching function call name to what's stored in the FUNCTION_REGISTRY
-            function_call_result = FUNCTION_REGISTRY[function_name](**kwargs)
-        else:
-            logger.bind(log="chat").error(f"Function '{function_name}' not found in function registry {FUNCTION_REGISTRY}")
-            raise KeyError(f"Function '{function_name}' not found in function registry {FUNCTION_REGISTRY}")
-        logger.bind(log="chat").info(f"function call result {function_call_result}")
-        self.add_function_call_to_messages(function_name=function_name, function_call_result=function_call_result)
-        return function_call_result
+        print("Function to call", self.response['tool_calls'])
+        function_call_results = []
+        for tool_call in self.response["tool_calls"]:
+            function_name = tool_call["function"]["name"]
+            kwargs = json.loads(tool_call["function"]["arguments"])
+            logger.bind(log="chat").info(f"Calling function: \"{function_name}\" with arguments \"{kwargs}\"")
+            tool_call_id = tool_call['id']
+            # if function_name == 'get_configuration_guideline':
+            #     function_call_result = get_configuration_guideline(query=kwargs["query"])
+            if function_name in FUNCTION_REGISTRY:
+                # dynamically call function - matching function call name to what's stored in the FUNCTION_REGISTRY
+                function_call_result = FUNCTION_REGISTRY[function_name](**kwargs)
+                function_call_results.append(function_call_result)
+                logger.bind(log="chat").info(f"function call result {function_call_result}")
+                print(f"Function call returned this result: {function_call_result}")
+                self.add_function_call_to_messages(function_name=function_name,
+                                                   function_call_result=function_call_result,
+                                                   tool_call_id=tool_call_id)
+            else:
+                logger.bind(log="chat").error(f"Function '{function_name}' not found in function registry {FUNCTION_REGISTRY}")
+                raise KeyError(f"Function '{function_name}' not found in function registry {FUNCTION_REGISTRY}")
+        return function_call_results
 
     @staticmethod
     def num_tokens_from_messages():
