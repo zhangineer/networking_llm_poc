@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     openai_model: str = Field(os.getenv("OPENAI_MODEL", ""), description="OpenAI model to be used")
 
     # ANTHROPIC_API_KEY: str = Field(os.getenv("ANTHROPIC_API_KEY"), description="ANTHROPIC API key")
-    pinecone_api_key: str = Field(os.getenv("PINECONE_API_KEY"), description="Pinecone API key")
+    # pinecone_api_key: str = Field(os.getenv("PINECONE_API_KEY"), description="Pinecone API key")
 
     # Database settings
     # DB_HOST: str = Field(..., description="Database host")
