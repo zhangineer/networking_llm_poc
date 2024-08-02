@@ -69,8 +69,8 @@ interface vlan200 // enters interface vlan200 configuration. usually these are g
   ip router ospf 1 area 0 // advertise interface subnets into OSPF area 0, this is required for reachability.
   no shut // admin up the interface
 
-Note that OSPF neighbors might not come up immediately after configuration change, it takes time to converge.
-Wait for 5 seconds before checking for neighborships
+Note: OSPF neighbors might not come up immediately after configuration change, it will take time to converge.
+Check multiple times for neighbor state as needed
 ```
 
 ## Thinking Steps By Step
