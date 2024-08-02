@@ -69,10 +69,12 @@ interface vlan200 // enters interface vlan200 configuration. usually these are g
   ip router ospf 1 area 0 // advertise interface subnets into OSPF area 0, this is required for reachability.
   no shut // admin up the interface
 ```
+Important: Once all the configurations are in place, give OSPF at least 10 - 20 seconds before the neighbors form
+you can also perform ping test to validate the connections
 
 ### OSPF States
 
-OSPF goes through multiple stages, it will take sometime before neighbor ship is fully formed
+OSPF goes through multiple stages, it will take sometime before neighbor is fully formed
 
 Init - OSPF has started initiating the neighbor establishment process.
 Exchange - OSPF routers have started exchanging database descriptors (DBD) packets.
