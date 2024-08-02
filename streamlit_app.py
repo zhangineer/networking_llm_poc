@@ -62,8 +62,6 @@ with st.sidebar:
     if 'OpenAI' in session_state.selected_model:
         openai_model_expander()
 
-st.write("Hello Welcome !!")
-
 assistant_tab, device_tab, topology_tab = st.tabs(["Assistant", "Devices", "Topology"])
 
 with device_tab:

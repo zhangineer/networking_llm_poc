@@ -35,7 +35,8 @@ def openai_model_expander():
                 type="password",
             )
             if not supplied_openai_api_key:
-                st.error("You must supply an API key before using chat")
+                st.warning("No API key provided, using the community key (restricted usage)")
+                # st.error("You must supply an API key before using chat")
                 # is_community_key = not BYPASS_SETTINGS_RESTRICTIONS
 
             else:
