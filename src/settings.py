@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     # chatGPT specific settings
     openai_api_key: str = Field(os.getenv("OPENAI_API_KEY", ""), description="OPENAI API key")
     openai_model: str = Field(os.getenv("OPENAI_MODEL", ""), description="OpenAI model to be used")
-
+    use_demo_key: bool = Field(True, description="whether to use demo key")
     # ANTHROPIC_API_KEY: str = Field(os.getenv("ANTHROPIC_API_KEY"), description="ANTHROPIC API key")
     # pinecone_api_key: str = Field(os.getenv("PINECONE_API_KEY"), description="Pinecone API key")
 

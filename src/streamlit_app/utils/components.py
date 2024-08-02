@@ -1,6 +1,7 @@
 import streamlit as st
+from src.settings import get_settings
 
-
+SETTINGS = get_settings()
 def update_model():
     st.session_state.selected_model = f"model: {st.session_state.model_selector}"
     st.session_state.selected_model_expanded = False
@@ -35,10 +36,13 @@ def openai_model_expander():
                 type="password",
             )
             if not supplied_openai_api_key:
-                st.warning("No API key provided, using the community key (restricted usage)")
-                # st.error("You must supply an API key before using chat")
-                # is_community_key = not BYPASS_SETTINGS_RESTRICTIONS
-
+                st.error("You must supply an API key before using chat")
             else:
                 # Use the key entered by the user as the OpenAI API key
                 st.session_state.api_key = supplied_openai_api_key
+
+        # if SETTINGS.use_community_key:
+        #     st.session_state.openai_api_key = SETTINGS.openai_api_key
+        #     st.warning("No API key provided, using the community key (restricted usage)")
+
+
