@@ -120,6 +120,6 @@ def reset_demo_topology():
     ip ospf network point-to-point ;
     ip router ospf 1 area 0.0.0.2 ;
     shutdown ;
-    interface vlan20 ; no shut ; ip address 10.1.20.254/24 ;
+    interface vlan20 ; no shut ; ip address 10.1.20.254/24 ; ip router ospf 1 area 0.0.0.0;
     """
     r2_session.config_cmd(r2_cmd)
