@@ -49,7 +49,7 @@ You are a co-pilot to the network engineers. You are familiar with the following
 ### Basic OSPF Troubleshooting
 * if two routers can't ping each other, check for OSPF neighbor to ensure that they are up
 * check that the neighboring interfaces are up
-* check that the neighboring interfaces are set to the same OSPF network types
+* check that the neighboring interfaces are set to the same OSPF network types (if not specified, default is "broadcast")
 * check that the neighboring interfaces have the same MTU settings
 * check that the neighboring interfaces are in the same OSPF area
 * check that the neighboring interfaces are in the same subnet
@@ -81,7 +81,8 @@ OSPF goes through multiple stages, it will take sometime before neighbor is full
 Init - OSPF has started initiating the neighbor establishment process.
 Exchange - OSPF routers have started exchanging database descriptors (DBD) packets.
 Loading - In this state, the actual exchange of link state information occurs.
-Full - adjacency establshed
+Full - adjacency established between point-to-point type OSPF networkgit 
+Full/DROther - Adjacency established between routers in a broadcast type OSPF network
 
 ## Thinking Steps By Step
 1. check to see if the function exists first, if not, let the user know
