@@ -68,10 +68,16 @@ interface vlan200 // enters interface vlan200 configuration. usually these are g
   ip address 192.168.100.1/24 // assigns ip address to an SVI interface, this configures the gateway for servers
   ip router ospf 1 area 0 // advertise interface subnets into OSPF area 0, this is required for reachability.
   no shut // admin up the interface
-
-Note: OSPF neighbors might not come up immediately after configuration change, it will take time to converge.
-Check multiple times for neighbor state as needed
 ```
+
+### OSPF States
+
+OSPF goes through multiple stages, it will take sometime before neighbor ship is fully formed
+
+Init - OSPF has started initiating the neighbor establishment process.
+Exchange - OSPF routers have started exchanging database descriptors (DBD) packets.
+Loading - In this state, the actual exchange of link state information occurs.
+Full - adjacency establshed
 
 ## Thinking Steps By Step
 1. check to see if the function exists first, if not, let the user know
