@@ -65,8 +65,8 @@ interface ethernet1/1 // enters the interface
   ip address 10.0.0.1/30 // assigns ip address to the interface 
 
 interface vlan200 // enters interface vlan200 configuration. usually these are gateways for servers
-  ip address 192.168.100.1/24 // assigns ip address to the interface, in the case of vlan, this configures the gateway for servers
-  ip router ospf 1 area 0 // assigns the interface to area 0 for OSPF process 1, this will advertise interface subnets into OSPF area 0
+  ip address 192.168.100.1/24 // assigns ip address to an SVI interface, this configures the gateway for servers
+  ip router ospf 1 area 0 // advertise interface subnets into OSPF area 0, this is required for reachability.
   no shut // admin up the interface
 ```
 
