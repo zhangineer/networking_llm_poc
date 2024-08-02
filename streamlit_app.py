@@ -25,7 +25,6 @@ SETTINGS = get_settings()
 
 _ = load_dotenv((find_dotenv()))
 
-
 st.set_page_config(page_title="Personal Intelligent Networking Guru (PING)")
 
 # names = ["Peter Parker", "Doctor Strange", "Captain Marvel", "Groot", "Homelander"]
@@ -108,11 +107,9 @@ with assistant_tab:
     #     with btn_col:
     #         if st.button(example_query, key=f"query{i}"):
     #             clicked_example_query = example_query
-
-    if 'openai_api_key' in st.session_state:
+    if st.session_state.get('openai_api_key'):
         if "messages" not in st.session_state:
             st.session_state.messages = []
-
         openai_api_key = st.session_state.openai_api_key
 
         functions = [execute_show_cmd_function, execute_config_cmd_function]
@@ -193,4 +190,4 @@ with assistant_tab:
             st.error("An unexpected error occurred. Please try again later or contact support.")
 
     else:
-        st.warning("API key not found. Please make sure you've entered your API key in the sidebar.")
+        st.error("API key not found. Please make sure you've entered your API key in the sidebar.")
