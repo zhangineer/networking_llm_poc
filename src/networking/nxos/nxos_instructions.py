@@ -81,7 +81,7 @@ OSPF goes through multiple stages, it will take sometime before neighbor is full
 Init - OSPF has started initiating the neighbor establishment process.
 Exchange - OSPF routers have started exchanging database descriptors (DBD) packets.
 Loading - In this state, the actual exchange of link state information occurs.
-Full - adjacency established between point-to-point type OSPF networkgit 
+Full - adjacency established between point-to-point type OSPF network
 Full/DROther - Adjacency established between routers in a broadcast type OSPF network
 
 ## Thinking Steps By Step
