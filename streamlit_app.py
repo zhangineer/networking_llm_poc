@@ -98,7 +98,7 @@ with topology_tab:
     pass
 
 with assistant_tab:
-    st.header("Chat Assistant")
+    st.header("Troubleshooting Assistant")
 
     clicked_example_query = None
     # for _ in range(5):
