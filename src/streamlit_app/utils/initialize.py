@@ -17,6 +17,8 @@ def initialize_app():
     st.session_state.idx_file_download = -1
     st.session_state.downloader_form_key = "downloader"
 
+    st.session_state.demo_mode = SETTINGS.demo_mode
+
     # st.session_state.user_avatar = USER_AVATAR
     # st.session_state.bot_avatar = CHATBOT_AVATAR
 

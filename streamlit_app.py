@@ -45,10 +45,12 @@ st.set_page_config(page_title="Personal Intelligent Networking Guru (PING)")
 #     st.warning("please enter username/password")
 #
 # else:
-#     if 'initialized' not in st.session_state:
-#         initialize_app()
+if 'initialized' not in st.session_state:
+    initialize_app()
 
 session_state = st.session_state
+
+assistant_tab, device_tab, topology_tab = st.tabs(["Assistant", "Devices", "Topology"])
 
 # Sidebar configuration
 with st.sidebar:
@@ -60,8 +62,9 @@ with st.sidebar:
     select_models()
     if 'OpenAI' in session_state.selected_model:
         openai_model_expander()
+    if st.button("Demo Mode"):
+        st.session_state.demo_mode = True
 
-assistant_tab, device_tab, topology_tab = st.tabs(["Assistant", "Devices", "Topology"])
 
 with device_tab:
     # chat page
@@ -98,6 +101,13 @@ with topology_tab:
     pass
 
 with assistant_tab:
+    if not st.session_state.devices:
+        st.error("no devices found, please add device first")
+
+    if st.session_state.demo_mode:
+        with st.spinner("resetting demo topology, please standby..."):
+            reset_demo_topology()
+
     st.header("Troubleshooting Assistant")
 
     clicked_example_query = None
@@ -124,11 +134,6 @@ with assistant_tab:
                 model=SETTINGS.openai_model,
                 functions=functions
             )
-            if st.session_state.devices:
-                with st.spinner("resetting demo topology, please standby..."):
-                    reset_demo_topology()
-            else:
-                st.write("no devices found, please add device first")
         conversation = st.session_state.conversation
 
         for message in st.session_state.messages[1:]:

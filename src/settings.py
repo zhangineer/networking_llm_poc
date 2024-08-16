@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     # ANTHROPIC_API_KEY: str = Field(os.getenv("ANTHROPIC_API_KEY"), description="ANTHROPIC API key")
     # pinecone_api_key: str = Field(os.getenv("PINECONE_API_KEY"), description="Pinecone API key")
 
+    demo_mode: bool = Field(False, description="whether to enable demo mode")
     # Database settings
     # DB_HOST: str = Field(..., description="Database host")
     # DB_PORT: int = Field(5432, description="Database port")
