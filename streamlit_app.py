@@ -154,6 +154,7 @@ with assistant_tab:
                 with st.spinner("thinking hard....."):
                     # Send completion request along with user prompt
                     openai_response = conversation.send_completion_request()
+                    print(f"reply: {openai_response}")
                     while openai_response.get('tool_calls'):
                         function_name = openai_response['tool_calls'][0]['function']['name']
                         logger.bind(log="chat").info(f"Making function call.... {function_name}")

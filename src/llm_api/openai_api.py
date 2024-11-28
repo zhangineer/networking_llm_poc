@@ -1,5 +1,4 @@
 from openai import OpenAI
-import openai
 from typing import List
 import json
 from src.llm_api.utils.helper import FUNCTION_REGISTRY
